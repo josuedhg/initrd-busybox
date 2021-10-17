@@ -13,8 +13,12 @@ define INIT_CONTENT
 /bin/sh
 endef
 
+.PHONY: all clean
+
 export INIT_CONTENT
-all:
+all: initramfs
+
+root:
 	mkdir root; \
 	cd root; \
 	mkdir -p bin dev etc lib mnt proc sbin sys tmp var; \
@@ -22,7 +26,8 @@ all:
 	curl -L 'https://www.busybox.net/downloads/binaries/1.26.2-defconfig-multiarch/busybox-x86_64' >root/bin/busybox; \
 	chmod +x root/bin/busybox; \
 	echo "$$INIT_CONTENT" > root/init; \
-	chmod +x root/init; \
+	chmod +x root/init;
+initramfs: root
 	cd root; \
 	find . | cpio -ov --format=newc | gzip -9 >../initramfs; \
 	cd -;
